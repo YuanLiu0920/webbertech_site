@@ -2,7 +2,7 @@ import pandas as pd
 import os
 
 
-def load_taxonomy_mapping(mapping_file='chunks/nucc_taxonomy_241.csv'):
+def load_taxonomy_mapping(mapping_file='nucc_taxonomy_241.csv'):
     print("Loading taxonomy mapping from:", mapping_file)
     if not os.path.exists(mapping_file):
         raise FileNotFoundError(f"Mapping file not found: {mapping_file}")
