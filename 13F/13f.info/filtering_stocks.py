@@ -4,8 +4,11 @@ from collections import Counter
 from bs4 import BeautifulSoup
 import pandas as pandas
 
-with open("13F/13f-urls.json","r") as urls:
-   companies_file = json.load(urls)
+with open("13F/13f.info/13f-urls.json","r") as urls:
+    if urls:
+        companies_file = json.load(urls)
+    else:
+        print("error")
 
 companies = companies_file.get("companies")
 
@@ -56,3 +59,8 @@ def most_stocks_held():
   sorted_stock_counts_df.index = sorted_stock_counts_df.index + 1
   
   print(sorted_stock_counts_df)
+
+
+if __name__ == '__main__':
+    recent_company_stock_filing()
+    most_stocks_held()
