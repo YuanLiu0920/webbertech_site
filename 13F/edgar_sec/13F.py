@@ -5,6 +5,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup
+import mysql.connector
+
 
 
 pd.set_option('display.max_rows', None)
@@ -12,6 +14,11 @@ pd.set_option('display.max_columns', None)
 pd.set_option('display.width', None)
 pd.set_option('display.max_colwidth', None)
 
+
+""" 
+Finds all the stock holdings for particular company (input cik_key of corresponding company)
+Use cik-lookup-data.txt (it's also in MySQL database but it is on localhost)
+"""
 def find_stock_holdings(cik_key):
 
     #required to access sec gov pages (via documentation)
@@ -36,7 +43,7 @@ def find_stock_holdings(cik_key):
     soup = BeautifulSoup(page_source, "html.parser")
 
     
-
+    # finds first htm link on the sec gov page and then fetches it
     def find_htm_link():
         data_export_div = soup.find("div", {"data-export": "Quarterly report filed by institutional managers, Holdings "})
 
@@ -51,9 +58,7 @@ def find_stock_holdings(cik_key):
                 print("No .htm link found within the div.")
         else:
             print("Div with the data-export attribute not found.")
-
-
-    
+ 
     response = requests.get(find_htm_link(), headers=headers)
 
     if response.status_code == 200:
@@ -88,13 +93,9 @@ def find_stock_holdings(cik_key):
                             "Total Value": total_value,
                             "Shares Owned": shares_owned,
                             "Filing Date": filing_date
-                            })
-                            
-
+                            })        
 
             df = pd.DataFrame(data)
-
-            
             df = df.groupby('Company Name', as_index=False).agg({
                 'Total Value': 'sum',
                 'Shares Owned': 'sum',
@@ -103,6 +104,7 @@ def find_stock_holdings(cik_key):
 
             df.sort_values(by='Total Value', ascending=False, inplace=True)
 
+            # Convert shares and total value of each stock held into billions(B), millions(M), & K depending on the value
             def divisibleBy(number):
                 string = ''
                 if number >= 1000000000: 
@@ -113,7 +115,6 @@ def find_stock_holdings(cik_key):
                     string = str(round(number / 1000)) + "K"
                 return string
         
-
             df['Total Value'] = df['Total Value'].astype(str)
             df['Shares Owned'] = df['Shares Owned'].astype(str)
 
@@ -133,6 +134,11 @@ def find_stock_holdings(cik_key):
 
     driver.quit()
 
+"""
+Finds overlapping stocks based on *args number of stock dataframes placed into the parameter
+Make sure you use the find_stock_holdings() function to generate stock holding dataframes and 
+input them into this function.
+"""
 def aggregate_holdings(*args):
     if not args:
         return "No DataFrame/s provided."
@@ -149,11 +155,16 @@ def aggregate_holdings(*args):
 
     return ", ".join(overlapping_stocks)
 
+#Feature 1 - Aggregating Stocks from various companies (10 digit number is cik key)
+find_stock_holdings('0001350694')
+
+#Feature 2 - Aggregating Stocks from various companies to get shared overlapping stocks (10 digit number is cik key)
 df1 = find_stock_holdings('0001350694')  # Bridgewater Associates
 df2 = find_stock_holdings('0001067983')  # Berkshire Hathaway
 df3 = find_stock_holdings('1037389')     # Renaissance Technologies
 df4 = find_stock_holdings('1610520')     # UBS Group AG
 same_holdings = aggregate_holdings(df1, df2, df3, df4)
 
+# TODO Print all original names of the company from CIK
 print("\nSame Stock Holdings:")
 print(same_holdings)
