@@ -4,7 +4,7 @@ import re
 """
 To use:
 USE DATABASE 13F;
-SHOW TABLES;
+SHOW TABLES; <- Shows all the tables within the 13F database
 DESCRIBE _____ <- (table_name) to see the table schema
 SELECT * FROM companies WHERE company_name LIKE '%INPUT TEXT%' - to find all related companies
 Ex. SELECT * FROM companies WHERE company_name LIKE '%Bridgewater Associates%'
