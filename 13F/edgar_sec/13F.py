@@ -157,12 +157,17 @@ def aggregate_holdings(*args):
 find_stock_holdings('0001350694')
 
 #Feature 2 - Aggregating Stocks from various companies to get shared overlapping stocks (10 digit number is cik key)
-df1 = find_stock_holdings('0001350694')  # Bridgewater Associates
-df2 = find_stock_holdings('0001067983')  # Berkshire Hathaway
-df3 = find_stock_holdings('1037389')     # Renaissance Technologies
-df4 = find_stock_holdings('1610520')     # UBS Group AG
-same_holdings = aggregate_holdings(df1, df2, df3, df4)
 
-# TODO Print all original names of the company from CIK
-print("\nSame Stock Holdings:")
-print(same_holdings)
+def find_common_holdings_multi_cik():
+    df1 = find_stock_holdings('0001350694')  # Bridgewater Associates
+    df2 = find_stock_holdings('0001067983')  # Berkshire Hathaway
+    df3 = find_stock_holdings('1037389')     # Renaissance Technologies
+    df4 = find_stock_holdings('1610520')     # UBS Group AG
+    same_holdings = aggregate_holdings(df1, df2, df3, df4)
+
+    # TODO Print all original names of the company from CIK
+    print("\nSame Stock Holdings:")
+    print(same_holdings)
+
+if __name__ == "__main__":
+    find_common_holdings_multi_cik()

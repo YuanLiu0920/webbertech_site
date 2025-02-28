@@ -1,11 +1,22 @@
 # 13F Database
 
 ---------------------------------------------
-The database supports financial analysis and investment research by storing and organizing data on 13F stock holdings of institutions/company. It allows users to track company ownership trends, analyze investment strategies, and monitor regulatory filings efficiently.
+The database supports financial analysis and investment research by storing and organizing data on 13F stock holdings of 
+institutions/companies. It allows users to track company ownership trends, analyze investment strategies, and monitor regulatory 
+filings efficiently.
+---------------------------------------------
 
+## How to run the code
+
+### Step 1 install python package
+
+`pip install webdriver-manager`
+
+### Step 2
+
+Run `13F.py`
 
 ## Database Schema:
-
 
 1. companies table:
 
