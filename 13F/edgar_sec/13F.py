@@ -5,7 +5,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup
-import mysql.connector
+#import mysql.connector
 
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
