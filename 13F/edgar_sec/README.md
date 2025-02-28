@@ -99,10 +99,31 @@ Filing Date – The date the 13F report was filed.
 
 ## TODO
 
-**Use CIK Lookup API from python package**
-
+**Use CIK Lookup API from python package** (Don't do this yet)
 https://sec-edgar.github.io/sec-edgar/about.html
+
+Please see `CIKLookupTest.py`, and we find it is actually parsing the following json file.
+
+https://www.sec.gov/files/company_tickers.json
+
+**https://www.sec.gov/Archives/edgar/data/1067983/000095012325002701/xslForm13F_X02/39042.xml** (High priority)
+
+Just pandas import the link, aggregate using groupBy companies on columns 4 and 5.
+Verify total holding and total value of each stock of the top 5 using third party website or resources.
+Try to understand 13F format.
+
+**https://www.sec.gov/files/company_tickers.json** (check the following ids are findable)
+
+1350694,1037389,1610520
+
+Worse secario, manual lookup.
 
 **Future Updates:**
 ---------------------------------------------
 TODO: Planning to add changes to stock_holdings so FK cik_key in companies table references PK cik_key in stock_holdings table
+
+## Ref
+
+- https://www.sec.gov/submit-filings/filer-support-resources/how-do-i-guides/look-central-index-key-cik-number
+- https://www.sec.gov/search-filings/cik-lookup
+- https://www.edgarcompany.sec.gov/
