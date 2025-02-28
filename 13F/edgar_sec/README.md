@@ -18,27 +18,12 @@ filings efficiently.
 
 Run `13F.py`
 
-## Database Schema:
-
-1. companies table:
-
--- `13f`.companies definition
-
-```sql
-CREATE TABLE `companies` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `company_name` varchar(255) NOT NULL,
-  `cik_key` varchar(20) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1969019 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-```
-
-**CIK**
+## CIK
 
 Stores information about companies that have investment holdings reported in 13F filings.
 Each company is uniquely identified by a CIK (Central Index Key), a 10-digit identifier assigned by the SEC.
 
-**cik-lookup-data.txt:** [How did we get this file?]
+**cik-lookup-data.txt:** [How did we get this file? Not being used?]
 Contains all public & private companies names and corresponding identifier of a 10-digit CIK key
 
 ---------------------------------------------
