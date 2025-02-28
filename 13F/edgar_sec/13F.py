@@ -15,9 +15,7 @@ pd.set_option('display.max_colwidth', None)
 
 def get_page_source(cik_key):
     # required to access sec gov pages (via documentation)
-    headers = {
-        "User-Agent": "darrenliu101@gmail.com"
-    }
+
 
     chrome_options = Options()
     chrome_options.add_argument("--headless")
@@ -60,7 +58,10 @@ def find_stock_holdings(cik_key):
                 print("No .htm link found within the div.")
         else:
             print("Div with the data-export attribute not found.")
- 
+
+    headers = {
+        "User-Agent": "darrenliu101@gmail.com"
+    }
     response = requests.get(find_htm_link(), headers=headers)
 
     if response.status_code == 200:
