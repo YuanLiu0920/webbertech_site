@@ -14,34 +14,36 @@ pd.set_option('display.max_colwidth', None)
 
 
 def get_page_source(cik_key):
-    # required to access sec gov pages (via documentation)
-    headers = {
-        "User-Agent": "darrenliu101@gmail.com"
-    }
 
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("start-maximized")
-    chrome_options.add_argument("disable-infobars")
-    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
-    chrome_options.add_argument(
-        "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36")
 
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=chrome_options)
-
-    driver.get(f"https://www.sec.gov/edgar/browse/?cik={cik_key}")
-    driver.implicitly_wait(20)
-
-    page_source = driver.page_source
-    return page_source
 
 """ 
 Finds all the stock holdings for particular company (input cik_key of corresponding company)
 Use cik-lookup-data.txt (it's also in MySQL database but it is on localhost)
 """
 def find_stock_holdings(cik_key):
-    page_source = get_page_source(cik_key)
+
+    #required to access sec gov pages (via documentation)
+    headers = {
+    "User-Agent": "darrenliu101@gmail.com"
+    }
+    
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("start-maximized")
+    chrome_options.add_argument("disable-infobars")
+    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
+    chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36")
+
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
+
+    driver.get(f"https://www.sec.gov/edgar/browse/?cik={cik_key}")
+    driver.implicitly_wait(20)
+    
+    page_source = driver.page_source
+
+
     soup = BeautifulSoup(page_source, "html.parser")
 
     
