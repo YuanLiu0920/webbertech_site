@@ -11,6 +11,7 @@ filings efficiently.
 ### Step 1 install python package
 
 `pip3 install lxml`
+
 `pip3 install webdriver-manager`
 
 ### Step 2
