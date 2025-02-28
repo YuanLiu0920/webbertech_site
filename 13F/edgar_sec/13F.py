@@ -5,17 +5,22 @@ from webdriver_manager.chrome import ChromeDriverManager
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup
-#import mysql.connector
 
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
 pd.set_option('display.width', None)
 pd.set_option('display.max_colwidth', None)
 
+"""
+param: cik_key (https://www.sec.gov/files/company_tickers.json)
+return: the source code of the url of the following,
+ 
+https://www.sec.gov/edgar/browse/?cik=1350694
 
+For invert and forward search of company name using Edgar Search please refer to the URLs in the README.md in this folder.
+"""
 def get_page_source(cik_key):
     # required to access sec gov pages (via documentation)
-
 
     chrome_options = Options()
     chrome_options.add_argument("--headless")
@@ -24,25 +29,31 @@ def get_page_source(cik_key):
     chrome_options.add_argument("--disable-blink-features=AutomationControlled")
     chrome_options.add_argument(
         "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36")
-
-    service = Service(ChromeDriverManager().install())
+    chrome_path = ChromeDriverManager().install()
+    print("debugging")
+    print(chrome_path)
+    if "THIRD_PARTY_NOTICES.chromedriver" in chrome_path:
+        chrome_path = chrome_path.replace("THIRD_PARTY_NOTICES.chromedriver", "chromedriver")
+    service = Service(chrome_path)
     driver = webdriver.Chrome(service=service, options=chrome_options)
 
     driver.get(f"https://www.sec.gov/edgar/browse/?cik={cik_key}")
     driver.implicitly_wait(20)
 
     page_source = driver.page_source
+    driver.quit()
     return page_source
 
 """ 
-Finds all the stock holdings for particular company (input cik_key of corresponding company)
-Use cik-lookup-data.txt (it's also in MySQL database but it is on localhost)
+param: cik_key
+return: top holdings of the specified company.
+
+
 """
 def find_stock_holdings(cik_key):
     page_source = get_page_source(cik_key)
     soup = BeautifulSoup(page_source, "html.parser")
 
-    
     # finds first htm link on the sec gov page and then fetches it
     def find_htm_link():
         data_export_div = soup.find("div", {"data-export": "Quarterly report filed by institutional managers, Holdings "})
@@ -67,24 +78,25 @@ def find_stock_holdings(cik_key):
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, 'html.parser')
 
-        
         date_div = soup.find('div', class_='formGrouping')
         filing_date = date_div.find('div', class_='info').get_text().strip()
 
-        
         links = soup.find_all('a', href=True)
+        # eg:
+        # `url: https://www.sec.gov/Archives/edgar/data/1350694/000117266125000823/0001172661-25-000823-index.htm`
         infotable_links = [link.get('href') for link in links if link.get('href').endswith('.xml')]
         if infotable_links:
+            # eg:
+            # https://www.sec.gov/Archives/edgar/data/1350694/000117266125000823/infotable.xml
             xml_doc_url = f"https://www.sec.gov/{infotable_links[-1]}"
+
             print("\nLast XML url:", xml_doc_url)
 
-            
             xml_response = requests.get(xml_doc_url, headers=headers)
             xml_content = xml_response.text
             soup = BeautifulSoup(xml_content, 'xml')
             info_tables = soup.find_all('infoTable')
 
-            
             data = []
             for info in info_tables:
                 company_name = info.find('nameOfIssuer').text if info.find('nameOfIssuer') else 'None'
@@ -135,7 +147,7 @@ def find_stock_holdings(cik_key):
     else:
         print("Failed to get the filing page")
 
-    driver.quit()
+
 
 """
 Finds overlapping stocks based on *args number of stock dataframes placed into the parameter

@@ -10,9 +10,10 @@ filings efficiently.
 
 ### Step 1 install python package
 
-`pip3 install lxml`
-
-`pip3 install webdriver-manager`
+* `pip3 install pandas`
+* `pip3 install bs4`
+* `pip3 install lxml`
+* `pip3 install webdriver-manager`
 
 ### Step 2
 
