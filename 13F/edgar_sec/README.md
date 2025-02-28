@@ -37,14 +37,19 @@ CREATE TABLE `companies` (
 Stores information about companies that have investment holdings reported in 13F filings.
 Each company is uniquely identified by a CIK (Central Index Key), a 10-digit identifier assigned by the SEC.
 
----------------------------------------------
-id - The index corresponding to the company_name and cik_key.
-company_name - The name of the institution/company.
-cik_key - a 10 digit number associated with corresponding institution/company.
----------------------------------------------
-
 **cik-lookup-data.txt:** [How did we get this file?]
 Contains all public & private companies names and corresponding identifier of a 10-digit CIK key
+
+---------------------------------------------
+
+- id - The index corresponding to the company_name and cik_key.
+
+- company_name - The name of the institution/company.
+
+- cik_key - a 10 digit number associated with corresponding institution/company.
+
+---------------------------------------------
+
 
 2. stock_holdings Table:
 
