@@ -1,3 +1,5 @@
+import sys
+
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -5,11 +7,19 @@ from webdriver_manager.chrome import ChromeDriverManager
 import requests
 import pandas as pd
 from bs4 import BeautifulSoup
+import platform
 
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
 pd.set_option('display.width', None)
 pd.set_option('display.max_colwidth', None)
+
+# Check if the system is Linux
+def is_linux():
+    if platform.system() == "Linux":
+        return True
+    else:
+        return False
 
 """
 param: cik_key (https://www.sec.gov/files/company_tickers.json)
@@ -24,18 +34,15 @@ def get_page_source(cik_key):
 
     chrome_options = Options()
     chrome_options.add_argument("--headless")
+    chrome_options.add_argument('user-data-dir=/tmp/chrome_headless')
     chrome_options.add_argument("start-maximized")
-    chrome_options.add_argument("disable-infobars")
-    chrome_options.add_argument("--disable-blink-features=AutomationControlled")
     chrome_options.add_argument(
         "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36")
-    chrome_path = ChromeDriverManager().install()
-    print("debugging")
-    print(chrome_path)
-    if "THIRD_PARTY_NOTICES.chromedriver" in chrome_path:
-        chrome_path = chrome_path.replace("THIRD_PARTY_NOTICES.chromedriver", "chromedriver")
-    service = Service(chrome_path)
-    driver = webdriver.Chrome(service=service, options=chrome_options)
+
+    if is_linux():
+        driver = webdriver.Chrome(service=Service('/usr/bin/chromedriver'), options=chrome_options)
+    else:
+        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
     driver.get(f"https://www.sec.gov/edgar/browse/?cik={cik_key}")
     driver.implicitly_wait(20)
@@ -52,6 +59,11 @@ return: top holdings of the specified company.
 """
 def find_stock_holdings(cik_key):
     page_source = get_page_source(cik_key)
+    print(page_source)
+    #sys.exit()
+    if page_source is None:
+        raise Exception("can't grab the initial html page.")
+
     soup = BeautifulSoup(page_source, "html.parser")
 
     # finds first htm link on the sec gov page and then fetches it
@@ -71,7 +83,7 @@ def find_stock_holdings(cik_key):
             print("Div with the data-export attribute not found.")
 
     headers = {
-        "User-Agent": "darrenliu101@gmail.com"
+        "User-Agent": "test@gmail.com"
     }
     response = requests.get(find_htm_link(), headers=headers)
 

@@ -15,6 +15,26 @@ filings efficiently.
 * `pip3 install lxml`
 * `pip3 install webdriver-manager`
 
+In ubuntu, run the following,
+
+`sudo apt install chromium-chromedriver`
+
+### Test driver
+
+It is a binary,
+
+```
+(base) xiaofengli@xiaofenglx:~/git/webbertech_site/13F/edgar_sec$ chromedriver
+Starting ChromeDriver 133.0.6943.53 (9a80935019b0925b01cc21d254da203bc3986f04-refs/branch-heads/6943@{#1389}) on port 0
+Only local connections are allowed.
+Please see https://chromedriver.chromium.org/security-considerations for suggestions on keeping ChromeDriver safe.
+ChromeDriver was started successfully on port 36357.
+(base) xiaofengli@xiaofenglx:~/git/webbertech_site/13F/edgar_sec$ which chromedriver
+/usr/bin/chromedriver
+```
+
+Run `headless_chrome_driver_test.py` and make sure you don't see any crash or errors.
+
 ### Step 2
 
 Run `13F.py`
@@ -57,16 +77,19 @@ CREATE TABLE `companies` (
 -- `13f`.stock_holdings definition
 
 ```sql
-CREATE TABLE `stock_holdings` (
-  `cik_key` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+CREATE TABLE `stock_holdings_snapshot` (
+  `cik_key` varchar(20),
   `holding_name` varchar(255) DEFAULT NULL,
-  `total_value` varchar(20) DEFAULT NULL,
+  `value` varchar(20) DEFAULT NULL,
   `shares_owned` varchar(20) DEFAULT NULL,
   `filing_date` date DEFAULT NULL,
+  `snapshot_date` date DEFAULT Date(),
   PRIMARY KEY (`cik_key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 ```
 
+The idea is that for certain company, for all the aggregation of one stock, we can see the holdings of shares are deceasing or increasing 
+compared with last filing.
 
 ## Business Logic
 
