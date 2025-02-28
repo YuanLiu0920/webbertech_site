@@ -7,8 +7,6 @@ import pandas as pd
 from bs4 import BeautifulSoup
 import mysql.connector
 
-
-
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
 pd.set_option('display.width', None)
