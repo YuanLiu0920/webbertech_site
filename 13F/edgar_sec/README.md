@@ -51,6 +51,20 @@ Contains all public & private companies names and corresponding identifier of a 
 
 ---------------------------------------------
 
+## Database Schema
+
+1. companies table:
+
+-- `13f`.companies definition
+
+```sql
+CREATE TABLE `companies` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `company_name` varchar(255) NOT NULL,
+  `cik_key` varchar(20) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1969019 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+```
 
 2. stock_holdings Table:
 
@@ -67,6 +81,9 @@ CREATE TABLE `stock_holdings` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 ```
 
+
+## Business Logic
+
 ---------------------------------------------
 Captures detailed stock holdings reported by institutional investors.
 
@@ -79,6 +96,12 @@ Shares Owned – The number of shares held at the time of filing.
 Filing Date – The date the 13F report was filed.
 ---------------------------------------------
 
+
+## TODO
+
+**Use CIK Lookup API from python package**
+
+https://sec-edgar.github.io/sec-edgar/about.html
 
 **Future Updates:**
 ---------------------------------------------
