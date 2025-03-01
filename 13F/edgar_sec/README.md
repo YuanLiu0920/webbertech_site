@@ -69,11 +69,11 @@ If the answer is no, we do not want to fix their package, we would just write ou
 
 https://www.sec.gov/files/company_tickers.json
 
-### Task3: Write another Util function with Pandas 
+### Task3: Write another Util function with Pandas (yangyang)
 
 **https://www.sec.gov/Archives/edgar/data/1067983/000095012325002701/xslForm13F_X02/39042.xml** (High priority)
 
-Just pandas import the link, aggregate using groupBy companies on columns 4 and 5.
+Just pandas import the above link, aggregate using groupBy companies on columns 4 and 5.
 Verify total holding and total value of each stock of the top 5 using third party website or resources.
 Try to understand 13F format.
 
@@ -83,17 +83,73 @@ Try to understand 13F format.
 
 Worse scenario, manual lookup.
 
-### Task4: Try to write to db.
+### Task4: Try to write to db. (Darren)
 
-Then we can take snapshot.
+@Darren, just finish the db code by using chatGPT, and quickly shove in some code to make it work.
+Then we can take snapshot to store the latest filing to the database.
+The snapshot should be based on the latest filing as of now.
 
-### Task5: Take a snapshot in both Python display/print and DB writing base on parameter of filing date.
+### Task5: Take a snapshot in both Python display/print and DB writing base on parameter of filing date. (Fix by Yangyang based on task4's Darren's work)
 
 https://www.sec.gov/edgar/browse/?cik=1350694
 
-**Future Updates:**
----------------------------------------------
-TODO: Planning to add changes to stock_holdings so FK cik_key in companies table references PK cik_key in stock_holdings table
+@Yangyang, right now the html scraping is to grab the latest. We would need to make this part a bit more smarter.
+
+We will be able to grab any arbiturary snapshot of filing, based on the filing date.
+
+### Task6: (Display improvement on CLI, yangyang)
+
+This is our current display for common sharing from multi institutions.
+We would like to display a few more columsn, of each of these institutions and their total holdings and shares of the
+of shares.
+
+```shell
+------------------Shared Stock Holdings---------------------
+NVR INC
+CAPITAL ONE FINL CORP
+CITIGROUP INC
+APPLE INC
+LENNAR CORP
+CONSTELLATION BRANDS INC
+CHEVRON CORP NEW
+LOUISIANA PAC CORP
+AON PLC
+VERISIGN INC
+VISA INC
+KROGER CO
+COCA COLA CO
+ALLY FINL INC
+DOMINOS PIZZA INC
+MOODYS CORP
+CHARTER COMMUNICATIONS INC N
+
+------------------End Stock Holdings---------------------
+```
+
+Expected to see the following,
+
+```
+Stock/ETF                    CIK1 [company_name2]                 CIK2[company_name2]         .....
+NVR INC
+CAPITAL ONE FINL CORP
+CITIGROUP INC
+APPLE INC
+LENNAR CORP
+CONSTELLATION BRANDS INC
+CHEVRON CORP NEW
+LOUISIANA PAC CORP
+AON PLC
+VERISIGN INC
+VISA INC
+KROGER CO
+COCA COLA CO
+ALLY FINL INC
+DOMINOS PIZZA INC
+MOODYS CORP
+CHARTER COMMUNICATIONS INC N
+```
+
+This is a simple output DF blending and added column headers...etc.
 
 ## Ref
 
