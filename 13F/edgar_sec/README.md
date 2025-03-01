@@ -81,6 +81,21 @@ Just pandas import the above link, aggregate using groupBy companies on columns 
 Verify total holding and total value of each stock of the top 5 using third party website or resources.
 Try to understand 13F format.
 
+import pandas as pd
+
+# Define the SEC 13F XML file URL
+xml_url = "https://www.sec.gov/Archives/edgar/data/1067983/000095012325002701/xslForm13F_X02/39042.xml"
+
+# Read XML data
+df = pd.read_xml(xml_url)
+
+df_grouped = df.groupby("name")[["value", "shrsOrPrnAmt"]].sum().reset_index()
+
+# Display the top 5 holdings
+df_grouped = df_grouped.sort_values(by="value", ascending=False).head(5)
+
+print(df_grouped)
+
 **https://www.sec.gov/files/company_tickers.json** (check the following ids are findable)
 
 1350694,1037389,1610520
