@@ -13,7 +13,6 @@ filings efficiently.
 * `pip3 install pandas`
 * `pip3 install bs4`
 * `pip3 install lxml`
-* `pip3 install webdriver-manager`
 
 In ubuntu, run the following,
 
@@ -21,9 +20,9 @@ In ubuntu, run the following,
 
 ### Test driver
 
-It is a binary,
+The above driver is a binary,
 
-```
+```shell
 (base) xiaofengli@xiaofenglx:~/git/webbertech_site/13F/edgar_sec$ chromedriver
 Starting ChromeDriver 133.0.6943.53 (9a80935019b0925b01cc21d254da203bc3986f04-refs/branch-heads/6943@{#1389}) on port 0
 Only local connections are allowed.
@@ -35,85 +34,42 @@ ChromeDriver was started successfully on port 36357.
 
 Run `headless_chrome_driver_test.py` and make sure you don't see any crash or errors.
 
-### Step 2
-
-Run `13F.py`
+### Step 2 Run `13F.py`
 
 ## CIK
 
 Stores information about companies that have investment holdings reported in 13F filings.
 Each company is uniquely identified by a CIK (Central Index Key), a 10-digit identifier assigned by the SEC.
 
-**cik-lookup-data.txt:** [How did we get this file? Not being used?]
-Contains all public & private companies names and corresponding identifier of a 10-digit CIK key
-
----------------------------------------------
-
-- id - The index corresponding to the company_name and cik_key.
-
-- company_name - The name of the institution/company.
-
-- cik_key - a 10 digit number associated with corresponding institution/company.
-
----------------------------------------------
-
-## Database Schema
-
-1. companies table:
-
--- `13f`.companies definition
-
-```sql
-CREATE TABLE `companies` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `company_name` varchar(255) NOT NULL,
-  `cik_key` varchar(20) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1969019 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-```
-
-2. stock_holdings Table:
-
--- `13f`.stock_holdings definition
-
-```sql
-CREATE TABLE `stock_holdings_snapshot` (
-  `cik_key` varchar(20),
-  `holding_name` varchar(255) DEFAULT NULL,
-  `value` varchar(20) DEFAULT NULL,
-  `shares_owned` varchar(20) DEFAULT NULL,
-  `filing_date` date DEFAULT NULL,
-  `snapshot_date` date DEFAULT Date(),
-  PRIMARY KEY (`cik_key`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-```
-
-The idea is that for certain company, for all the aggregation of one stock, we can see the holdings of shares are deceasing or increasing 
-compared with last filing.
-
 ## Business Logic
 
----------------------------------------------
-Captures detailed stock holdings reported by institutional investors.
+This system is more like the `https://hedgefollow.com/13f`. It provides,
 
-Each entry is linked to a company via the cik_key, establishing a relationship between investment firms and their holdings.
+* Database to take snapshot of certain companies, not all [only those to our interests].
+* From the DB SQL query we can check from last filing and the latest filing, regarding each stock whether it is increasing shares or decreasing. [we are not providing external financial service like the hedgefollow]
+* CLI: We provide certain functions, which later on, we will restrict which functiosn is internal functions such as the private functions in Java so that only certain functions can be called CLI.
+* A simple web interface to show us some aggregation using reactjs + typescript.
 
----------------------------------------------
-Holding Name – The name of the security held.
-Total Value – The reported value of the holdings.
-Shares Owned – The number of shares held at the time of filing.
-Filing Date – The date the 13F report was filed.
----------------------------------------------
+Tip: coding we will extensively using chatGPT or grok3, not type or write by hand. Our job is to stich the code quickly and test it and send PR.
 
+As a new generation of computer programming or IT professional we would like to increase our learning rate to produce IT products and artifacts.
 
-## TODO
+### Task1 Just test the following API and see if it is good or not
 
 **Use CIK Lookup API from python package** (Don't do this yet)
 https://sec-edgar.github.io/sec-edgar/about.html
 
 Please see `CIKLookupTest.py`, and we find it is actually parsing the following json file.
 
+Question: Can we just use it without redesign the wheel.
+
+### Task2 Design our own cik lookup
+
+If the answer is no, we do not want to fix their package, we would just write our own by `piggyback` their code and improve it.
+
 https://www.sec.gov/files/company_tickers.json
+
+### Task3: Write another Util function with Pandas 
 
 **https://www.sec.gov/Archives/edgar/data/1067983/000095012325002701/xslForm13F_X02/39042.xml** (High priority)
 
@@ -125,7 +81,15 @@ Try to understand 13F format.
 
 1350694,1037389,1610520
 
-Worse secario, manual lookup.
+Worse scenario, manual lookup.
+
+### Task4: Try to write to db.
+
+Then we can take snapshot.
+
+### Task5: Take a snapshot in both Python display/print and DB writing base on parameter of filing date.
+
+https://www.sec.gov/edgar/browse/?cik=1350694
 
 **Future Updates:**
 ---------------------------------------------
