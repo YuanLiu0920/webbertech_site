@@ -14,6 +14,10 @@ pd.set_option('display.max_columns', None)
 pd.set_option('display.width', None)
 pd.set_option('display.max_colwidth', None)
 
+headers = {
+    "User-Agent": "test@gmail.com"
+}
+
 # Check if the system is Linux
 def is_linux():
     if platform.system() == "Linux":
@@ -59,7 +63,7 @@ return: top holdings of the specified company.
 """
 def find_stock_holdings(cik_key):
     page_source = get_page_source(cik_key)
-    print(page_source)
+    #print(page_source)
     #sys.exit()
     if page_source is None:
         raise Exception("can't grab the initial html page.")
@@ -82,9 +86,6 @@ def find_stock_holdings(cik_key):
         else:
             print("Div with the data-export attribute not found.")
 
-    headers = {
-        "User-Agent": "test@gmail.com"
-    }
     response = requests.get(find_htm_link(), headers=headers)
 
     if response.status_code == 200:
@@ -195,8 +196,11 @@ def find_common_holdings_multi_cik():
     same_holdings = aggregate_holdings(df1, df2, df3, df4)
 
     # TODO Print all original names of the company from CIK
-    print("\nSame Stock Holdings:")
-    print(same_holdings)
+    print("\n------------------Same Stock Holdings----------------")
+    
+    for company in same_holdings:
+        print(company+ "\n")
+    
 
 if __name__ == "__main__":
     find_common_holdings_multi_cik()
