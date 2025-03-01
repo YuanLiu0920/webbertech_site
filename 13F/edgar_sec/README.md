@@ -41,6 +41,10 @@ Run `headless_chrome_driver_test.py` and make sure you don't see any crash or er
 Stores information about companies that have investment holdings reported in 13F filings.
 Each company is uniquely identified by a CIK (Central Index Key), a 10-digit identifier assigned by the SEC.
 
+## lru_cache
+
+Cache is added for experiemental usage, but I do not have enough time to see if it makes a difference in timing.
+
 ## Business Logic
 
 This system is more like the `https://hedgefollow.com/13f`. It provides,
