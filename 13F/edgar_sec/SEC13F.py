@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 import platform
 from functools import lru_cache
 import time
+import xml.etree.ElementTree as ET
 
 """
 Static function: it doesn't rely on self object. This is `this` in java.
@@ -36,8 +37,47 @@ def aggregate_holdings(df_list):
     return ", ".join(overlapping_stocks)
 
 
+
+"""
+    Converts an XML string to a Pandas DataFrame.
+
+    Args:
+        xml_string (str): The XML string to convert.
+        root_tag (str): The root tag of the XML document.
+        record_tag (str): The tag name for individual records/rows in the XML.
+
+    Returns:
+        pd.DataFrame: A Pandas DataFrame representing the XML data.
+"""
+# Please refer to
+#https://www.google.com/search?q=xml+request+response+to+pandas&oq=xml+request+response+to+pandas&gs_lcrp=EgZjaHJvbWUyBggAEEUYOTIHCAEQIRigATIHCAIQIRigATIHCAMQIRigATIHCAQQIRigATIHCAUQIRigATIHCAYQIRifBTIHCAcQIRifBTIHCAgQIRifBTIHCAkQIRifBdIBCDU0ODFqMGo3qAIAsAIA&sourceid=chrome&ie=UTF-8
+
+def xml_to_pandas(xml_string, root_tag, record_tag):
+
+    try:
+        root = ET.fromstring(xml_string)
+    except ET.ParseError as e:
+        raise ValueError(f"Invalid XML format: {e}")
+
+    if root.tag != root_tag:
+        raise ValueError(f"Root tag '{root.tag}' does not match expected '{root_tag}'")
+
+    records = root.findall(f".//{record_tag}")
+
+    if not records:
+        return pd.DataFrame()
+
+    data = []
+    for record in records:
+        record_data = {}
+        for element in record:
+            record_data[element.tag] = element.text
+        data.append(record_data)
+    return pd.DataFrame(data)
+
+
 class SEC13F:
-    headers = {
+    __headers__ = {
         "User-Agent": "test@gmail.com"
     }
 
@@ -89,6 +129,25 @@ class SEC13F:
         driver.quit()
         return page_source
 
+    """
+    finds first htm link on the sec gov page and then fetches it.
+    It should be the latest 13F-HR filing.
+    """
+    def __find_htm_link(self, soup):
+        data_export_div = soup.find("div",
+                                    {"data-export": "Quarterly report filed by institutional managers, Holdings "})
+
+        if data_export_div:
+            a_tag = data_export_div.find_all("a", class_="filing-link-all-files")
+            if a_tag:
+                href = a_tag[0].get("href")
+                filing_url = "https://sec.gov" + href
+                print("Found the .htm link:", filing_url)
+                return filing_url
+            else:
+                print("No .htm link found within the div.")
+        else:
+            print("Div with the data-export attribute not found.")
     """ 
     param: cik_key
     return: top holdings of the specified company based on the xml from SEC website.
@@ -106,23 +165,7 @@ class SEC13F:
 
         soup = BeautifulSoup(page_source, "html.parser")
 
-        # finds first htm link on the sec gov page and then fetches it
-        def find_htm_link():
-            data_export_div = soup.find("div", {"data-export": "Quarterly report filed by institutional managers, Holdings "})
-
-            if data_export_div:
-                a_tag = data_export_div.find_all("a", class_="filing-link-all-files")
-                if a_tag:
-                    href = a_tag[0].get("href")
-                    filing_url = "https://sec.gov" + href
-                    print("Found the .htm link:", filing_url)
-                    return filing_url
-                else:
-                    print("No .htm link found within the div.")
-            else:
-                print("Div with the data-export attribute not found.")
-
-        response = requests.get(find_htm_link(), headers=self.headers)
+        response = requests.get(self.__find_htm_link(soup), headers=self.__headers__)
 
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, 'html.parser')
@@ -141,7 +184,7 @@ class SEC13F:
 
                 print("\nLast XML url:", xml_doc_url)
 
-                xml_response = requests.get(xml_doc_url, headers=self.headers)
+                xml_response = requests.get(xml_doc_url, headers=self.__headers__)
                 xml_content = xml_response.text
                 soup = BeautifulSoup(xml_content, 'xml')
                 info_tables = soup.find_all('infoTable')
@@ -199,10 +242,21 @@ class SEC13F:
     """
     TODO: 
         yangyang please try this
+    parameter: https://www.sec.gov/Archives/edgar/data/1350694/000117266125000823/infotable.xml
+    return: formated output
     """
-    def aggregation_from_sec_xml(self):
-        pass
+    def aggregation_from_sec_xml(self, xml_url):
+        xml_response = requests.get(xml_url, headers=self.__headers__)
+        print(xml_response.text)
 
+        #TODO xml_to_pandas
+
+        #df = pd.read_xml(xml_url)
+        #df_grouped = df.groupby("name")[["value", "shrsOrPrnAmt"]].sum().reset_index()
+        # Display the top 5 holdings
+
+        #df_grouped = df_grouped.sort_values(by="value", ascending=False).head()
+        #print(df_grouped)
 
     """"
     TODO:
@@ -222,8 +276,6 @@ class SEC13F:
         
     Output: A list of company names, displayed vertically.
     """
-
-
     def find_common_holdings_multi_cik(self, list_of_ciks):
         if len(list_of_ciks) == 0:
             raise Exception("Invalid input, please check function definitions.")
@@ -249,3 +301,5 @@ if __name__ == "__main__":
     c.find_common_holdings_multi_cik(tuple(['1350694', '1067983', '1037389', '1610520']))
     end = time.time()
     print("function timing test:"+ str(end - start))
+
+    #c.aggregation_from_sec_xml("https://www.sec.gov/Archives/edgar/data/1350694/000117266125000823/infotable.xml")

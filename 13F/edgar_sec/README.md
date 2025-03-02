@@ -170,6 +170,13 @@ CHARTER COMMUNICATIONS INC N
 
 This is a simple output DF blending and added column headers...etc.
 
+## Task 7 Finance research (asset size, decreasing order we need to find out how to find that list from 13F websites or documentations.)
+
+For example, `H&H International Investment`.
+* https://www.sec.gov/files/company_tickers.json
+* https://hedgefollow.com/13f
+* https://hedgefollow.com/funds/H-And-H+International+Investment+LLC
+
 ## Ref
 
 - https://www.sec.gov/submit-filings/filer-support-resources/how-do-i-guides/look-central-index-key-cik-number
