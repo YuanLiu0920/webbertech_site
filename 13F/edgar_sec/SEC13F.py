@@ -136,18 +136,18 @@ class SEC13F:
     def __find_htm_link(self, soup):
         data_export_div = soup.find("div",
                                     {"data-export": "Quarterly report filed by institutional managers, Holdings "})
+        if data_export_div is None:
+            raise Exception("Div with the data-export attribute not found.")
 
-        if data_export_div:
-            a_tag = data_export_div.find_all("a", class_="filing-link-all-files")
-            if a_tag:
-                href = a_tag[0].get("href")
-                filing_url = "https://sec.gov" + href
-                print("Found the .htm link:", filing_url)
-                return filing_url
-            else:
-                print("No .htm link found within the div.")
+        a_tag = data_export_div.find_all("a", class_="filing-link-all-files")
+        if a_tag:
+            href = a_tag[0].get("href")
+            filing_url = "https://sec.gov" + href
+            print("Found the .htm link:", filing_url)
+            return filing_url
         else:
-            print("Div with the data-export attribute not found.")
+            print("No .htm link found within the div.")
+
     """ 
     param: cik_key
     return: top holdings of the specified company based on the xml from SEC website.
