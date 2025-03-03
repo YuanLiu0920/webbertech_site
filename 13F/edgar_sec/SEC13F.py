@@ -89,11 +89,6 @@ class SEC13F:
     param: cik_key
     return: top holdings of the specified company based on the xml from SEC website.
     Example: https://www.sec.gov/Archives/edgar/data/1350694/000117266125000823/infotable.xml
-    
-    TODO: We need to break down this functions even more. What is good about this is the nested function definition which 
-    hides where it is from being accessed from outside, but the problem of this is that, the function find_htm_link()
-    does not only find but it did the essential work. We would like to make sure the function names are actually doing what the
-    names tells you to do.
     """
     def find_stock_holdings(self, cik_key):
         page_source = self.__get_page_source(cik_key)
@@ -104,76 +99,71 @@ class SEC13F:
 
         response = requests.get(self.__find_htm_link(soup), headers=self.__headers__)
 
-        if response.status_code == 200:
-            soup = BeautifulSoup(response.text, 'html.parser')
+        if not response.status_code == 200:
+            raise Exception("Failed to get the filing page")
+        soup = BeautifulSoup(response.text, 'html.parser')
 
-            date_div = soup.find('div', class_='formGrouping')
-            filing_date = date_div.find('div', class_='info').get_text().strip()
+        date_div = soup.find('div', class_='formGrouping')
+        filing_date = date_div.find('div', class_='info').get_text().strip()
 
-            links = soup.find_all('a', href=True)
-            # eg:
-            # `url: https://www.sec.gov/Archives/edgar/data/1350694/000117266125000823/0001172661-25-000823-index.htm`
-            infotable_links = [link.get('href') for link in links if link.get('href').endswith('.xml')]
-            if infotable_links:
-                # eg:
-                # https://www.sec.gov/Archives/edgar/data/1350694/000117266125000823/infotable.xml
-                xml_doc_url = f"https://www.sec.gov/{infotable_links[-1]}"
+        links = soup.find_all('a', href=True)
+        # eg:
+        # `url: https://www.sec.gov/Archives/edgar/data/1350694/000117266125000823/0001172661-25-000823-index.htm`
+        infotable_links = [link.get('href') for link in links if link.get('href').endswith('.xml')]
 
-                print("\nLast XML url:", xml_doc_url)
 
-                xml_response = requests.get(xml_doc_url, headers=self.__headers__)
-                xml_content = xml_response.text
-                soup = BeautifulSoup(xml_content, 'xml')
-                info_tables = soup.find_all('infoTable')
+        if not infotable_links or len(infotable_links) == 0:
+            raise Exception("No XML files found.")
 
-                data = []
-                for info in info_tables:
-                    company_name = info.find('nameOfIssuer').text if info.find('nameOfIssuer') else 'None'
-                    total_value = int(info.find('value').text) if info.find('value') else 0
-                    shares_table = info.find('shrsOrPrnAmt')
-                    shares_owned = int(shares_table.find('sshPrnamt').text) if shares_table and shares_table.find('sshPrnamt') else 0
+        # eg:
+        # https://www.sec.gov/Archives/edgar/data/1350694/000117266125000823/infotable.xml
+        latest_13f_filing_xml = infotable_links[-1]
 
-                    data.append({'Company Name': company_name,
-                                "Total Value": total_value,
-                                "Shares Owned": shares_owned,
-                                "Filing Date": filing_date
-                                })
+        ### TODO: Need to break down from here to the end of this function and put it into aggregation_from_sec_xml(xml_url, filing_date)
+        xml_doc_url = f"https://www.sec.gov{latest_13f_filing_xml}"
 
-                df = pd.DataFrame(data)
-                df = df.groupby('Company Name', as_index=False).agg({
-                    'Total Value': 'sum',
-                    'Shares Owned': 'sum',
-                    'Filing Date': 'first'
-                })
+        print("\nlatest_13f_filing XML url:", xml_doc_url)
 
-                df.sort_values(by='Total Value', ascending=False, inplace=True)
+        xml_response = requests.get(xml_doc_url, headers=self.__headers__)
+        xml_content = xml_response.text
+        soup = BeautifulSoup(xml_content, 'xml')
+        info_tables = soup.find_all('infoTable')
 
-                # Convert shares and total value of each stock held into billions(B), millions(M), & K depending on the value
-                def divisibleBy(number):
-                    string = ''
-                    if number >= 1000000000:
-                        string =  str(round(number / 1000000000)) + "B"
-                    elif number >= 1000000:
-                        string = str(round(number / 1000000)) + "M"
-                    else:
-                        string = str(round(number / 1000)) + "K"
-                    return string
+        data = []
+        for info in info_tables:
+            company_name = info.find('nameOfIssuer').text if info.find('nameOfIssuer') else 'None'
+            total_value = int(info.find('value').text) if info.find('value') else 0
+            shares_table = info.find('shrsOrPrnAmt')
+            shares_owned = int(shares_table.find('sshPrnamt').text) if shares_table and shares_table.find('sshPrnamt') else 0
 
-                df['Total Value'] = df['Total Value'].astype(str)
-                df['Shares Owned'] = df['Shares Owned'].astype(str)
+            data.append({'Company Name': company_name,
+                        "Total Value": total_value,
+                        "Shares Owned": shares_owned,
+                        "Filing Date": filing_date
+                        })
 
-                for index, row in df.iterrows():
-                    total_value = int(row['Total Value'])
-                    shares_owned = int(row['Shares Owned'])
+        df = pd.DataFrame(data)
+        df = df.groupby('Company Name', as_index=False).agg({
+            'Total Value': 'sum',
+            'Shares Owned': 'sum',
+            'Filing Date': 'first'
+        })
 
-                    df.at[index, 'Total Value'] = divisibleBy(total_value)
-                    df.at[index, 'Shares Owned'] = divisibleBy(shares_owned)
+        df.sort_values(by='Total Value', ascending=False, inplace=True)
 
-                return df
-            else:
-                print("No XML files found.")
-        else:
-            print("Failed to get the filing page")
+        df['Total Value'] = df['Total Value'].astype(str)
+        df['Shares Owned'] = df['Shares Owned'].astype(str)
+
+        for index, row in df.iterrows():
+            total_value = int(row['Total Value'])
+            shares_owned = int(row['Shares Owned'])
+
+            df.at[index, 'Total Value'] = divisibleBy(total_value)
+            df.at[index, 'Shares Owned'] = divisibleBy(shares_owned)
+
+        return df
+
+
 
 
     """
@@ -182,7 +172,7 @@ class SEC13F:
     parameter: https://www.sec.gov/Archives/edgar/data/1350694/000117266125000823/infotable.xml
     return: formated output
     """
-    def aggregation_from_sec_xml(self, xml_url):
+    def aggregation_from_sec_xml(self, xml_url, filing_date):
         xml_response = requests.get(xml_url, headers=self.__headers__)
         print(xml_response.text)
 

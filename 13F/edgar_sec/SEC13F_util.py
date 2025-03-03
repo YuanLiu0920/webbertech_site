@@ -25,7 +25,16 @@ def aggregate_holdings(df_list):
 
     return ", ".join(overlapping_stocks)
 
-
+# Convert shares and total value of each stock held into billions(B), millions(M), & K depending on the value
+def divisibleBy(number):
+    string = ''
+    if number >= 1000000000:
+        string =  str(round(number / 1000000000)) + "B"
+    elif number >= 1000000:
+        string = str(round(number / 1000000)) + "M"
+    else:
+        string = str(round(number / 1000)) + "K"
+    return string
 
 """
     Converts an XML string to a Pandas DataFrame.
