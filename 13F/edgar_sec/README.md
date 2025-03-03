@@ -170,12 +170,21 @@ CHARTER COMMUNICATIONS INC N
 
 This is a simple output DF blending and added column headers...etc.
 
-## Task 7 Finance research (asset size, decreasing order we need to find out how to find that list from 13F websites or documentations.)
+## Task 7 Finance research (asset size, decreasing order we need to find out how to find that list from 13F websites or documentations. Assignee: yangyang)
 
 For example, `H&H International Investment`.
 * https://www.sec.gov/files/company_tickers.json
 * https://hedgefollow.com/13f
 * https://hedgefollow.com/funds/H-And-H+International+Investment+LLC
+
+>Hint: notes from Kevin, I actually found the following link,
+
+- https://www.sec.gov/cgi-bin/browse-edgar?company=&CIK=&type=13F&owner=include&count=100&action=getcurrent
+
+- https://www.sec.gov/files/form_13f.pdf
+- https://www.sec.gov/data-research/sec-markets-data/form-13f-data-sets (zip of csv) - Maybe this is the place to get all the companies name and CIKs.
+
+But I can only see 100 entries at most, not sure if we can hack the API or they offer some other APIs that can pull all the companies names.
 
 ## Ref
 

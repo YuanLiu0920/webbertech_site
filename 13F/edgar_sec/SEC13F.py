@@ -14,7 +14,7 @@ import xml.etree.ElementTree as ET
 """
 Static function: it doesn't rely on self object. This is `this` in java.
 We can repurpose this for a lot of other functions for reusability.
-
+1067983
 Examples:
 c = SEC13F()
 c.find_common_holdings_multi_cik(['1350694', '1067983', '1037389', '1610520'])
