@@ -9,7 +9,7 @@ cursor = conn.cursor()
 
 # Create bank_accounts table
 cursor.execute('''
-CREATE TABLE IF NOT EXISTS bank_accounts (
+CREATE TABLE IF NOT EXISTS bank_account (
     id INTEGER PRIMARY KEY,
     bank_name TEXT NOT NULL,
     account_name TEXT NOT NULL,
@@ -23,8 +23,8 @@ CREATE TABLE IF NOT EXISTS bank_accounts (
 )
 ''')
 
-cursor.execute('DROP INDEX IF EXISTS bank_accounts_account_number_IDX')
-cursor.execute('CREATE UNIQUE INDEX bank_accounts_account_number_IDX ON bank_accounts (account_number, routing_number)')
+cursor.execute('DROP INDEX IF EXISTS bank_account_account_number_IDX')
+cursor.execute('CREATE UNIQUE INDEX bank_account_account_number_IDX ON bank_account (account_number, routing_number)')
 
 # Create bond table
 cursor.execute('''
