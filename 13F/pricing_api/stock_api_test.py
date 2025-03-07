@@ -1,0 +1,16 @@
+from stock_api import *
+
+get_current_price("pltr")
+get_current_price("nio")
+get_current_price("open")
+get_current_price("goog")
+get_current_price("msft")
+get_current_price("aapl")
+get_current_price("nvda")
+get_current_price("ko")
+get_current_price("voo")
+get_current_price("xlf")
+get_current_price("moat")
+get_current_price("schd")
+get_current_price("spy")
+get_current_price("gld")
