@@ -163,11 +163,9 @@ class SEC13F:
         return df
 
 
-
-
     """
     TODO: 
-        yangyang please try this
+        Darren please try this, try to cut the code logic from the bulky logic from the original line 121 to 164
     parameter: https://www.sec.gov/Archives/edgar/data/1350694/000117266125000823/infotable.xml
     return: formated output
     """
@@ -185,21 +183,19 @@ class SEC13F:
         #print(df_grouped)
 
     """"
-    TODO:
-        Darren please fill out this
+    TODO: Break this method down to just lookup for one company name to cik.
+          Then keep the look of string from the outside logic
     """
-    def CIKLookUp(company_names: list[str]):
+    def cik_lookup(self, company_names: list[str]):
         cik_list = []
-        # needed to access sec edgar api/site
-        user_agent = {'User-Agent': "testing111@gmail.com"}
 
         # 1350694
-        companyTickers = requests.get("https://www.sec.gov/files/company_tickers.json",headers=user_agent)
+        company_tickers = requests.get("https://www.sec.gov/files/company_tickers.json",headers=self.__headers__)
 
-        companyData = pd.DataFrame.from_dict(companyTickers.json(), orient='index')
+        company_data = pd.DataFrame.from_dict(company_tickers.json(), orient='index')
 
         #fill all ciks with leading zeros for proper cik key 
-        companyData['cik_str'] = companyData['cik_str'].astype(str).str.zfill(10)
+        company_data['cik_str'] = company_data['cik_str'].astype(str).str.zfill(10)
 
         #Prints out the dataframe for the companydata (ticker, cik_key, and company title/name)
         #print(companyData)
@@ -209,19 +205,18 @@ class SEC13F:
             if len(company_name.split()) == 1:
                 company_name = company_name.upper().strip()
 
-                if not companyData[companyData['ticker'] == company_name].empty:
+                if not company_data[company_data['ticker'] == company_name].empty:
                     #grabs first cik_str of row it sees
-                    cik_str = companyData[companyData['ticker'] == company_name]['cik_str'].iloc[0]
+                    cik_str = company_data[company_data['ticker'] == company_name]['cik_str'].iloc[0]
                     cik_list.append(cik_str)
                 else:
                     raise Exception(f"Ticker {company_name} not found.")
 
             ## case sensitivity check, use "Apple Inc" vs "Apple INC"
             else:
-                
-                if not companyData[companyData['title'] == company_name.strip()].empty:
+                if not company_data[company_data['title'] == company_name.strip()].empty:
                     #grabs first cik_str of row it sees
-                    cik_str = companyData[companyData['title'] == company_name.strip()]['cik_str'].iloc[0]
+                    cik_str = company_data[company_data['title'] == company_name.strip()]['cik_str'].iloc[0]
                     cik_list.append(cik_str)
                 else:
                     print(f"Company {company_name} not found.")
@@ -259,7 +254,7 @@ class SEC13F:
 
 if __name__ == "__main__":
     c = SEC13F()
-    print(SEC13F.CIKLookUp(['BHLB','Apple Inc.','UBS','META','COST',"AMERICAN EXPRESS CO","ABBOTT LABORATORIES "]))
+    print(SEC13F.cik_lookup(['BHLB','Apple Inc.','UBS','META','COST',"AMERICAN EXPRESS CO","ABBOTT LABORATORIES "]))
 
     start = time.time()
     c.find_common_holdings_multi_cik(tuple(['1350694', '1067983', '1037389', '1610520']))

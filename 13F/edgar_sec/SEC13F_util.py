@@ -73,3 +73,5 @@ def xml_to_pandas(xml_string, root_tag, record_tag):
             record_data[element.tag] = element.text
         data.append(record_data)
     return pd.DataFrame(data)
+
+
