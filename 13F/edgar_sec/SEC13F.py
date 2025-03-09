@@ -183,11 +183,10 @@ class SEC13F:
         #print(df_grouped)
 
     """"
-    TODO: Break this method down to just lookup for one company name to cik.
-          Then keep the loop of string from the outside logic
+    just lookup for one company name to cik.
     """
-    def cik_lookup(self, company_names: list[str]):
-        cik_list = []
+    def cik_lookup(self, company_name):
+        print(company_name)
 
         # 1350694
         company_tickers = requests.get("https://www.sec.gov/files/company_tickers.json",headers=self.__headers__)
@@ -197,30 +196,29 @@ class SEC13F:
         #fill all ciks with leading zeros for proper cik key 
         company_data['cik_str'] = company_data['cik_str'].astype(str).str.zfill(10)
 
-        #Prints out the dataframe for the companydata (ticker, cik_key, and company title/name)
-        #print(companyData)
+        #check to see if its one word (ticker) or multiple words (the company title name)
+        if len(company_name.split()) == 1:
+            company_name = company_name.upper().strip()
 
-        for company_name in company_names:
-            #check to see if its one word (ticker) or multiple words (the company title name)
-            if len(company_name.split()) == 1:
-                company_name = company_name.upper().strip()
-
-                if not company_data[company_data['ticker'] == company_name].empty:
-                    #grabs first cik_str of row it sees
-                    cik_str = company_data[company_data['ticker'] == company_name]['cik_str'].iloc[0]
-                    cik_list.append(cik_str)
-                else:
-                    raise Exception(f"Ticker {company_name} not found.")
-
-            ## case sensitivity check, use "Apple Inc" vs "Apple INC"
+            if not company_data[company_data['ticker'] == company_name].empty:
+                #grabs first cik_str of row it sees
+                cik_str = company_data[company_data['ticker'] == company_name]['cik_str'].iloc[0]
+                return cik_str
             else:
-                if not company_data[company_data['title'] == company_name.strip()].empty:
-                    #grabs first cik_str of row it sees
-                    cik_str = company_data[company_data['title'] == company_name.strip()]['cik_str'].iloc[0]
-                    cik_list.append(cik_str)
-                else:
-                    print(f"Company {company_name} not found.")
-        return cik_list
+                raise Exception(f"Ticker {company_name} not found.")
+
+        ## case sensitivity check, use "Apple Inc" vs "Apple INC"
+        else:
+            if not company_data[company_data['title'] == company_name.strip()].empty:
+                #grabs first cik_str of row it sees
+                cik_str = company_data[company_data['title'] == company_name.strip()]['cik_str'].iloc[0]
+                return cik_str
+            else:
+                print(f"Company {company_name} not found.")
+
+    ## Darren can you see if you can fill this up
+    def company_name_lookup(company_name:str):
+        pass
 
     """
     Finds overlapping stocks based on *args number of stock dataframes placed into the parameter
@@ -239,6 +237,7 @@ class SEC13F:
 
         data_frames = []
         for cik in list_of_ciks:
+           #company_name = self.company_name_lookup(cik)
            data_frames.append(self.find_stock_holdings(cik))
         same_holdings = aggregate_holdings(data_frames)
 
@@ -247,14 +246,16 @@ class SEC13F:
 
         print("\n------------------Shared Stock Holdings---------------------")
         shared_holdings = same_holdings.split(",")
-        for company in shared_holdings:
-            print(company.strip())
+        for holding in shared_holdings:
+            print(holding.strip())
         print("\n------------------End Stock Holdings---------------------")
 
 
 if __name__ == "__main__":
     c = SEC13F()
-    print(SEC13F.cik_lookup(['BHLB','Apple Inc.','UBS','META','COST',"AMERICAN EXPRESS CO","ABBOTT LABORATORIES "]))
+    companies = ['BHLB','Apple Inc.','UBS','META','COST',"AMERICAN EXPRESS CO","ABBOTT LABORATORIES "]
+    for company in companies:
+        print(c.cik_lookup(company))
 
     start = time.time()
     c.find_common_holdings_multi_cik(tuple(['1350694', '1067983', '1037389', '1610520']))
