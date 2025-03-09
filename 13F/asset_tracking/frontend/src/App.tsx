@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import BankAccounts from './BankAccounts';
+import Bonds from './Bonds';
 import StockList from './StockList';
 
 const App: React.FC = () => {
@@ -17,6 +18,7 @@ const App: React.FC = () => {
     <div className="App">
       <h1>Investment Tracker</h1>
       <BankAccounts />
+       <Bonds />
     </div>
   );
 };

@@ -11,3 +11,15 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* styles.css */
+.table-with-border {
+  border-collapse: collapse; /* Ensures borders are merged */
+  width: 100%;
+}
+
+.table-with-border th, .table-with-border td {
+  border: 1px solid black; /* Adds border to table cells */
+  padding: 8px; /* Adds padding for better spacing */
+  text-align: left; /* Aligns text to the left */
+}

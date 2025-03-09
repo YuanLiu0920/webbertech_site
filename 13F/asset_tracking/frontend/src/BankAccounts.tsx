@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import './index.css';
 
 interface BankAccount {
   id: number;
@@ -42,7 +43,7 @@ const BankAccounts: React.FC = () => {
   return (
     <div>
       <h2>Bank Accounts</h2>
-      <table>
+      <table className="table-with-border">
         <thead>
           <tr>
             <th>ID</th>
