@@ -193,6 +193,7 @@ class SEC13F:
         # needed to access sec edgar api/site
         user_agent = {'User-Agent': "testing111@gmail.com"}
 
+        # 1350694
         companyTickers = requests.get("https://www.sec.gov/files/company_tickers.json",headers=user_agent)
 
         companyData = pd.DataFrame.from_dict(companyTickers.json(), orient='index')
@@ -258,7 +259,7 @@ class SEC13F:
 
 if __name__ == "__main__":
     c = SEC13F()
-    print(SEC13F.CIKLookUp(['BHLB','Apple INC.','UBS','META','COST',"AMERICAN EXPRESS CO","ABBOTT LABORATORIES "]))
+    print(SEC13F.CIKLookUp(['BHLB','Apple Inc.','UBS','META','COST',"AMERICAN EXPRESS CO","ABBOTT LABORATORIES "]))
 
     start = time.time()
     c.find_common_holdings_multi_cik(tuple(['1350694', '1067983', '1037389', '1610520']))

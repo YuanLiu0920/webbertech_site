@@ -46,9 +46,35 @@ CREATE TABLE bond (
 INSERT INTO bank_account
 (id, bank_name, account_name, account_number, routing_number, deposit_amount, current_amount, maturity_date, current_rate, comments)
 VALUES(0, '', '', '', '', 0, 0, '', '', '');
+```
 
 ```sql
 INSERT INTO bond
 (id, bond_name, bond_type, bond_term, amount, maturity_date, apy, platform, comment)
 VALUES(0, '', '', 0, 0, 0, 0, '', '');
 ```
+
+```
+select SUM(current_amount) from bank_accounts;
+
+
+select SUM(current_amount) from bank_accounts
+group by bank_name;
+
+
+select SUM(current_amount) from bank_accounts
+where bank_name = "synchrony";
+
+
+select account_number ,current_amount from bank_accounts
+where bank_name = "synchrony";
+
+
+INSERT INTO bank_accounts
+(id, bank_name, account_name, account_number, routing_number, deposit_amount, current_amount, maturity_date, current_rate, comments)
+VALUES(null, 'synchrony', 'cd', '7001217389', '021213591', 0, 26796.71, '08/22/2025', '4.80', '');
+```
+
+
+
+

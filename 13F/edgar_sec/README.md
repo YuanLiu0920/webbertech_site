@@ -120,7 +120,7 @@ We will be able to grab any arbiturary snapshot of filing, based on the filing d
 ### Task6: (Display improvement on CLI, yangyang)
 
 This is our current display for common sharing from multi institutions.
-We would like to display a few more columsn, of each of these institutions and their total holdings and shares of the
+We would like to display a few more columns, of each of these institutions and their total holdings and shares of the
 of shares.
 
 ```shell
