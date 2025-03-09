@@ -184,7 +184,7 @@ class SEC13F:
 
     """"
     TODO: Break this method down to just lookup for one company name to cik.
-          Then keep the look of string from the outside logic
+          Then keep the loop of string from the outside logic
     """
     def cik_lookup(self, company_names: list[str]):
         cik_list = []
