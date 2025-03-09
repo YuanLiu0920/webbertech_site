@@ -173,6 +173,9 @@ This is a simple output DF blending and added column headers...etc.
 
 ## Task 7 Finance research (asset size, decreasing order we need to find out how to find that list from 13F websites or documentations. Assignee: yangyang)
 
+Let us assume, 13F filers, who had AUM more than 100M, there are 8000 -10K companies filing.
+Who are they, can we get a decreasing order to see who they are. (tops 50s, their performance. -- finance question)
+
 For example, `H&H International Investment`.
 * https://www.sec.gov/files/company_tickers.json
 * https://hedgefollow.com/13f
@@ -186,6 +189,21 @@ For example, `H&H International Investment`.
 - https://www.sec.gov/data-research/sec-markets-data/form-13f-data-sets (zip of csv) - Maybe this is the place to get all the companies name and CIKs.
 
 But I can only see 100 entries at most, not sure if we can hack the API or they offer some other APIs that can pull all the companies names.
+
+
+## 3 Characters of Information
+
+* Asymmetric, I know, you don't know and I am rich.
+* Realtime feature. 
+* Historic feature. Give me the last 150 yr of DOWS, and what is the pattern. Pattern on the left. Data cost money.
+
+Extra, the data might not be the raw it might be some insight, data analysis or big data analysis.
+Analyzed data already.
+
+>Hint:
+> * Google search(raw data, cached web crawler stuff from your websites and DNS servers), build into index for quick search. 
+> * ML/deepseak/OpenAI/Grok3, raw model + curated structured raw data -> trained model(huge, TB or GB)
+> * Database (can be huge, but also file, had B tree indexed, just like google search using column-based db as well.) vs trained model (file)
 
 ## Ref
 

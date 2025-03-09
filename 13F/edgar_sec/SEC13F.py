@@ -206,24 +206,24 @@ class SEC13F:
         for company_name in company_names:
             #check to see if its one word (ticker) or multiple words (the company title name)
             if len(company_name.split()) == 1:
-                company_name = company_name.upper()
+                company_name = company_name.upper().strip()
 
                 if not companyData[companyData['ticker'] == company_name].empty:
                     #grabs first cik_str of row it sees
                     cik_str = companyData[companyData['ticker'] == company_name]['cik_str'].iloc[0]
                     cik_list.append(cik_str)
                 else:
-                    print(f"Ticker {company_name} not found.")
-                
+                    raise Exception(f"Ticker {company_name} not found.")
+
+            ## case sensitivity check, use "Apple Inc" vs "Apple INC"
             else:
                 
-                if not companyData[companyData['title'] == company_name].empty:
+                if not companyData[companyData['title'] == company_name.strip()].empty:
                     #grabs first cik_str of row it sees
-                    cik_str = companyData[companyData['title'] == company_name]['cik_str'].iloc[0]
+                    cik_str = companyData[companyData['title'] == company_name.strip()]['cik_str'].iloc[0]
                     cik_list.append(cik_str)
                 else:
                     print(f"Company {company_name} not found.")
-        
         return cik_list
 
     """
@@ -258,7 +258,7 @@ class SEC13F:
 
 if __name__ == "__main__":
     c = SEC13F()
-    print(SEC13F.CIKLookUp(['BHLB','Apple Inc.','UBS','META','COST',"AMERICAN EXPRESS CO","ABBOTT LABORATORIES"]))
+    print(SEC13F.CIKLookUp(['BHLB','Apple INC.','UBS','META','COST',"AMERICAN EXPRESS CO","ABBOTT LABORATORIES "]))
 
     start = time.time()
     c.find_common_holdings_multi_cik(tuple(['1350694', '1067983', '1037389', '1610520']))
