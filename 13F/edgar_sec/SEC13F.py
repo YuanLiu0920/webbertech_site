@@ -111,7 +111,6 @@ class SEC13F:
         # `url: https://www.sec.gov/Archives/edgar/data/1350694/000117266125000823/0001172661-25-000823-index.htm`
         infotable_links = [link.get('href') for link in links if link.get('href').endswith('.xml')]
 
-
         if not infotable_links or len(infotable_links) == 0:
             raise Exception("No XML files found.")
 

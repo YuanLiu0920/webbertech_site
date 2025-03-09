@@ -105,7 +105,21 @@ Worse secario, manual lookup.
 
 **Future Updates:**
 ---------------------------------------------
+
+## Companies to look at 
+
 TODO: Planning to add changes to stock_holdings so FK cik_key in companies table references PK cik_key in stock_holdings table
+
+Most-Searched Managers
+Berkshire Hathaway Inc
+Duquesne Family Office LLC
+Scion Asset Management, LLC
+Pershing Square Capital Management, L.P.
+Altimeter Capital Management, LP
+Renaissance Technologies LLC
+Appaloosa LP
+BlackRock Inc.
+
 
 ## Ref
 

@@ -21,3 +21,4 @@ def stock_info(ticker):
     print(stock_data.fast_info)
     print(stock_data.funds_data)
 
+stock_info("aapl")

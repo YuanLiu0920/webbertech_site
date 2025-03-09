@@ -1,16 +1,25 @@
 from stock_api import *
 
-get_current_price("pltr")
-get_current_price("nio")
-get_current_price("open")
+## Blue chip
+
 get_current_price("goog")
 get_current_price("msft")
 get_current_price("aapl")
 get_current_price("nvda")
+
+## Rusessel
+get_current_price("pltr") # Trump stock
+get_current_price("nio") # Chinese E CAR
+get_current_price("open") # AI in real estate
+
+# food, industry
+
 get_current_price("ko")
-get_current_price("voo")
-get_current_price("xlf")
-get_current_price("moat")
-get_current_price("schd")
-get_current_price("spy")
-get_current_price("gld")
+
+# ETF
+get_current_price("voo") # vanguard sp500
+get_current_price("xlf") # all finance sec
+get_current_price("moat")  # finance+healthcare
+get_current_price("schd") # high dividend sp500, 3%
+get_current_price("spy") # state street sp500
+get_current_price("gld") # state street gold ETF, gldm
