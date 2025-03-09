@@ -189,8 +189,43 @@ class SEC13F:
     TODO:
         Darren please fill out this
     """
-    def cik_lookup(list_of_ciks):
-        pass
+    def CIKLookUp(company_names: list[str]):
+        cik_list = []
+        # needed to access sec edgar api/site
+        user_agent = {'User-Agent': "testing111@gmail.com"}
+
+        companyTickers = requests.get("https://www.sec.gov/files/company_tickers.json",headers=user_agent)
+
+        companyData = pd.DataFrame.from_dict(companyTickers.json(), orient='index')
+
+        #fill all ciks with leading zeros for proper cik key 
+        companyData['cik_str'] = companyData['cik_str'].astype(str).str.zfill(10)
+
+        #Prints out the dataframe for the companydata (ticker, cik_key, and company title/name)
+        #print(companyData)
+
+        for company_name in company_names:
+            #check to see if its one word (ticker) or multiple words (the company title name)
+            if len(company_name.split()) == 1:
+                company_name = company_name.upper()
+
+                if not companyData[companyData['ticker'] == company_name].empty:
+                    #grabs first cik_str of row it sees
+                    cik_str = companyData[companyData['ticker'] == company_name]['cik_str'].iloc[0]
+                    cik_list.append(cik_str)
+                else:
+                    print(f"Ticker {company_name} not found.")
+                
+            else:
+                
+                if not companyData[companyData['title'] == company_name].empty:
+                    #grabs first cik_str of row it sees
+                    cik_str = companyData[companyData['title'] == company_name]['cik_str'].iloc[0]
+                    cik_list.append(cik_str)
+                else:
+                    print(f"Company {company_name} not found.")
+        
+        return cik_list
 
     """
     Finds overlapping stocks based on *args number of stock dataframes placed into the parameter
@@ -224,9 +259,12 @@ class SEC13F:
 
 if __name__ == "__main__":
     c = SEC13F()
+    print(SEC13F.CIKLookUp(['BHLB','Apple Inc.','UBS','META','COST',"AMERICAN EXPRESS CO","ABBOTT LABORATORIES"]))
+
     start = time.time()
     c.find_common_holdings_multi_cik(tuple(['1350694', '1067983', '1037389', '1610520']))
     end = time.time()
     print("function timing test:"+ str(end - start))
+
 
     #c.aggregation_from_sec_xml("https://www.sec.gov/Archives/edgar/data/1350694/000117266125000823/infotable.xml")
