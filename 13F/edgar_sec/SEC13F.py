@@ -113,6 +113,11 @@ class SEC13F:
         # `url: https://www.sec.gov/Archives/edgar/data/1350694/000117266125000823/0001172661-25-000823-index.htm`
         infotable_links = [link.get('href') for link in links if link.get('href').endswith('.xml')]
 
+<<<<<<< Updated upstream
+=======
+
+
+>>>>>>> Stashed changes
         if not infotable_links or len(infotable_links) == 0:
             raise Exception("No XML files found.")
 
@@ -171,18 +176,105 @@ class SEC13F:
     parameter: https://www.sec.gov/Archives/edgar/data/1350694/000117266125000823/infotable.xml
     return: formated output
     """
-    def aggregation_from_sec_xml(self, xml_url, filing_date):
-        xml_response = requests.get(xml_url, headers=self.__headers__)
-        print(xml_response.text)
 
-        #TODO xml_to_pandas
+    import time
+    import requests
+    from bs4 import BeautifulSoup
+    import pandas as pd
 
-        #df = pd.read_xml(xml_url)
-        #df_grouped = df.groupby("name")[["value", "shrsOrPrnAmt"]].sum().reset_index()
-        # Display the top 5 holdings
+    def xml_to_pandas(self, xml_url):
+        """
+        Fetches the XML from SEC, parses the <infoTable> entries,
+        and returns a pandas DataFrame.
+        """
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.0.0 Safari/537.36",
+            "Accept-Encoding": "gzip, deflate",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Referer": "https://www.sec.gov/",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Cache-Control": "max-age=0",
+            "Connection": "keep-alive",
+        }
 
-        #df_grouped = df_grouped.sort_values(by="value", ascending=False).head()
-        #print(df_grouped)
+        # 🔴 Use a session to make SEC requests look more legitimate
+        session = requests.Session()
+        session.headers.update(headers)
+
+        # 🔴 SEC blocks rapid requests, so add a delay
+        time.sleep(2)  # Wait 2 seconds before making the request
+
+        try:
+            response = session.get(xml_url, timeout=10)
+            response.raise_for_status()  # Raise error if request fails
+        except requests.exceptions.RequestException as e:
+            print(f"❌ Error fetching XML: {e}")
+            return pd.DataFrame()  # Return empty DataFrame to prevent crashes
+
+        xml_content = response.text
+        print("\n--- Raw XML Content (First 500 Characters) ---")
+        print(xml_content[:500])  # Print first 500 characters to check structure
+
+        soup = BeautifulSoup(xml_content, 'xml')
+
+        # 🛑 Debugging: Check if <infoTable> exists
+        info_tables = soup.find_all('infoTable')
+        print(f"\n--- Found {len(info_tables)} <infoTable> entries ---")
+
+        if not info_tables:
+            print("⚠️ No <infoTable> found in XML! XML structure may have changed.")
+            return pd.DataFrame()  # Return empty DataFrame to prevent crashes
+
+        data = []
+        for info in info_tables:
+            company_name = info.find('nameOfIssuer')
+            total_value = info.find('value')
+            shares_table = info.find('shrsOrPrnAmt')
+
+            if company_name and total_value and shares_table:
+                shares_owned = shares_table.find('sshPrnamt')
+                data.append({
+                    "Company Name": company_name.text.strip() if company_name else 'Unknown',
+                    "Total Value": int(total_value.text.strip()) if total_value else 0,
+                    "Shares Owned": int(shares_owned.text.strip()) if shares_owned else 0
+                })
+
+        df = pd.DataFrame(data)
+
+        # 🛑 Debugging: Print DataFrame before returning
+        print("\n--- DataFrame Extracted ---")
+        print(df.head())
+        print("Columns:", df.columns)
+        print(f"Total Rows: {len(df)}\n")
+
+        return df
+
+    def aggregation_from_sec_xml(self, xml_url):
+        df = self.xml_to_pandas(xml_url)
+
+        # Ensure the DataFrame is not empty and has the expected column
+        if df.empty:
+            print("Error: DataFrame is empty! Check XML structure.")
+            return
+
+        expected_columns = {"Company Name", "Total Value", "Shares Owned"}
+        missing_columns = expected_columns - set(df.columns)
+
+        if missing_columns:
+            print(f"Error: Missing columns in DataFrame: {missing_columns}")
+            return
+
+        # Group by Company Name and aggregate Total Value and Shares Owned
+        df_grouped = df.groupby("Company Name", as_index=False).agg({
+            'Total Value': 'sum',
+            'Shares Owned': 'sum'
+        })
+
+        # Sort to get the top 5 holdings based on Total Value
+        df_grouped = df_grouped.sort_values(by='Total Value', ascending=False).head(5)
+
+        print("\n--- Top 5 Holdings ---")
+        print(df_grouped)
 
     """"
     just lookup for one company name to cik.
@@ -255,6 +347,7 @@ class SEC13F:
 
 if __name__ == "__main__":
     c = SEC13F()
+<<<<<<< Updated upstream
     companies = ['BHLB','Apple Inc.','UBS','META','COST',"AMERICAN EXPRESS CO","ABBOTT LABORATORIES "]
     for company in companies:
         print(c.cik_lookup(company))
@@ -266,3 +359,11 @@ if __name__ == "__main__":
 
 
     #c.aggregation_from_sec_xml("https://www.sec.gov/Archives/edgar/data/1350694/000117266125000823/infotable.xml")
+=======
+    #start = time.time()
+    #c.find_common_holdings_multi_cik(tuple(['1350694', '1067983', '1037389', '1610520']))
+    #end = time.time()
+    #print("function timing test:"+ str(end - start))
+    c.aggregation_from_sec_xml("https://www.sec.gov/Archives/edgar/data/1067983/000095012324011775/infotable.xml")
+
+>>>>>>> Stashed changes
