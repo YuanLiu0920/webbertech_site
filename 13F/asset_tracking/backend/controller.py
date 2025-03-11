@@ -1,30 +1,29 @@
 from flask import Flask, jsonify
 import sqlite3
 import os
-import requests
 from dotenv import load_dotenv
 from flask_cors import CORS
 
-# ✅ Load environment variables from .env
+# ✅ Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)  # ✅ Allow React to call API
+
+# ✅ Ensure CORS is configured properly
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 ALPHA_VANTAGE_API_KEY = os.getenv("ALPHA_VANTAGE_API_KEY")
 
-
-# ✅ Function to connect to database
+# ✅ Function to connect to the database
 def get_db_connection():
-    db_path = './investment.db'
+    db_path = './investment.db'  # Make sure this path is correct
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     return conn
 
-
 @app.route('/')
 def index():
-    return "<h1>✅ Flask API Running! Use <a href='/api/tables'>/api/tables</a> to get data.</h1>"
+    return "<h1>✅ Flask API Running! Use <a href='/api/bank_accounts'>/api/bank_accounts</a> to get data.</h1>"
 
 @app.route('/api/bank_accounts', methods=['GET'])
 def get_bank_accounts():
@@ -33,7 +32,7 @@ def get_bank_accounts():
     conn.close()
 
     if not accounts:
-        return jsonify({"error": "No bank accounts found"}), 404  # ✅ Return an error if no data
+        return jsonify({"error": "No bank accounts found"}), 404
 
     return jsonify([dict(account) for account in accounts])
 
@@ -44,10 +43,10 @@ def get_bonds():
     conn.close()
 
     if not bonds:
-        return jsonify({"error": "No stocks found"}), 404  # ✅ Return an error if no data
+        return jsonify({"error": "No bonds found"}), 404
 
     return jsonify([dict(bond) for bond in bonds])
 
 if __name__ == '__main__':
-    print("Flask API is running at http://127.0.0.1:5000/")
-    app.run(debug=True)
+    print("✅ Flask API is running at http://127.0.0.1:5000/")
+    app.run(debug=True, host='0.0.0.0', port=5000)

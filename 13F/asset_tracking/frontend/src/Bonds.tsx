@@ -1,13 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import './index.css';
+import { useEffect, useMemo, useState } from 'react';
+import React from 'react';
 
- {/*
-      (id, bond_name, bond_type, bond_term, amount, maturity_date, apy, platform, comment)*/}
+import {
+  MaterialReactTable,
+  useMaterialReactTable,
+  type MRT_ColumnDef,
+} from 'material-react-table';
+
 interface Bond {
   id: number;
   bond_name: string;
   bond_type: string;
-  bond_term: string;
+  bond_term: number;
   amount: number;
   maturity_date: string;
   apy: number;
@@ -18,66 +22,49 @@ interface Bond {
 const Bonds: React.FC = () => {
   const [bonds, setBonds] = useState<Bond[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>('');
 
-  useEffect(() => {
-    fetch('/api/bonds')
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then((data: Bond[]) => {
-        setBonds(data);
-        setLoading(false);
-      })
-      .catch((err: Error) => {
-        setError(err.message);
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) return <p>Loading bonds accounts...</p>;
-  if (error) return <p>Error: {error}</p>;
+    useEffect(() => {
+      fetch('http://localhost:5000/api/bonds')
+        .then((response) => response.json())
+        .then((data: Bond[]) => {
+          console.log("Bonds Data:", data);  // ✅ Log response to console
+          setBonds(data);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error("Error fetching bonds:", err);
+          setLoading(false);
+        });
+    }, []);
 
 
-  return (
-    <div>
-      <h2>Bonds</h2>
-      <table className="table-with-border">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>bond_name</th>
-            <th>bond_type</th>
-            <th>bond_term</th>
-            <th>amount</th>
-            <th>maturity_date</th>
-            <th>apy</th>
-            <th>platform</th>
-            <th>comment</th>
-          </tr>
-        </thead>
-        <tbody>
-          {bonds.map((it) => (
-            <tr key={it.id}>
-              <td>{it.id}</td>
-              <td>{it.bond_name}</td>
-              <td>{it.bond_type}</td>
-              <td>{it.bond_term}</td>
-              <td>{it.amount}</td>
-              <td>{it.maturity_date}</td>
-              <td>{it.apy}</td>
-               <td>{it.platform}</td>
-               <td>{it.comment}</td>
-
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+  const columns = useMemo<MRT_ColumnDef<Bond>[]>(
+    () => [
+      { accessorKey: 'bond_name', header: 'Bond Name', size: 200 },
+      { accessorKey: 'bond_type', header: 'Bond Type', size: 150 },
+      { accessorKey: 'bond_term', header: 'Bond Term (Years)', size: 120 },
+      { accessorKey: 'amount', header: 'Amount ($)', size: 150 },
+      { accessorKey: 'maturity_date', header: 'Maturity Date', size: 180 },
+      { accessorKey: 'apy', header: 'APY (%)', size: 120 },
+      { accessorKey: 'platform', header: 'Platform', size: 150 },
+      { accessorKey: 'comment', header: 'Comment', size: 250 },
+    ],
+    []
   );
+
+  const table = useMaterialReactTable({
+    columns,
+    data: bonds,
+    state: { isLoading: loading },
+    enablePagination: true,
+    enableSorting: true,
+    enableColumnResizing: true,
+    enableColumnVirtualization: true,
+    enableRowNumbers: true,
+    muiTableContainerProps: { sx: { maxHeight: '600px' } },
+  });
+
+  return <MaterialReactTable table={table} />;
 };
 
 export default Bonds;

@@ -1,5 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import './index.css';
+import { useEffect, useMemo, useState } from 'react';
+import React from 'react';
+
+import {
+  MaterialReactTable,
+  useMaterialReactTable,
+  type MRT_ColumnDef,
+} from 'material-react-table';
 
 interface BankAccount {
   id: number;
@@ -17,60 +23,50 @@ interface BankAccount {
 const BankAccounts: React.FC = () => {
   const [accounts, setAccounts] = useState<BankAccount[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>('');
 
-  useEffect(() => {
-    fetch('/api/bank_accounts')
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then((data: BankAccount[]) => {
-        setAccounts(data);
-        setLoading(false);
-      })
-      .catch((err: Error) => {
-        setError(err.message);
-        setLoading(false);
-      });
-  }, []);
+    useEffect(() => {
+      fetch('http://localhost:5000/api/bank_accounts')
+        .then((response) => response.json())
+        .then((data: BankAccount[]) => {
+          console.log("Bank Accounts Data:", data);  // ✅ Log response to console
+          setAccounts(data);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error("Error fetching bank accounts:", err);
+          setLoading(false);
+        });
+    }, []);
 
-  if (loading) return <p>Loading bank accounts...</p>;
-  if (error) return <p>Error: {error}</p>;
 
-  return (
-    <div>
-      <h2>Bank Accounts</h2>
-      <table className="table-with-border">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Bank Name</th>
-            <th>Account Name</th>
-            <th>Account Number</th>
-            <th>Routing Number</th>
-            <th>Current Amount</th>
-            <th>Maturity Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {accounts.map((account) => (
-            <tr key={account.id}>
-              <td>{account.id}</td>
-              <td>{account.bank_name}</td>
-              <td>{account.account_name}</td>
-              <td>{account.account_number}</td>
-              <td>{account.routing_number}</td>
-              <td>{account.current_amount}</td>
-              <td>{account.maturity_date}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+  const columns = useMemo<MRT_ColumnDef<BankAccount>[]>(
+    () => [
+      { accessorKey: 'bank_name', header: 'Bank Name', size: 200 },
+      { accessorKey: 'account_name', header: 'Account Name', size: 200 },
+      { accessorKey: 'account_number', header: 'Account Number', size: 180 },
+      { accessorKey: 'routing_number', header: 'Routing Number', size: 180 },
+      { accessorKey: 'deposit_amount', header: 'Deposit Amount ($)', size: 150 },
+      { accessorKey: 'current_amount', header: 'Current Amount ($)', size: 150 },
+      { accessorKey: 'maturity_date', header: 'Maturity Date', size: 180 },
+      { accessorKey: 'current_rate', header: 'Current Rate (%)', size: 120 },
+      { accessorKey: 'comments', header: 'Comments', size: 250 },
+    ],
+    []
   );
+
+  const table = useMaterialReactTable({
+    columns,
+    data: accounts,
+    state: { isLoading: loading },
+    enablePagination: true,
+    enableSorting: true,
+    enableColumnResizing: true,
+    enableColumnVirtualization: true,
+    enableRowNumbers: true,
+    muiTableContainerProps: { sx: { maxHeight: '600px' } },
+  });
+
+  return <MaterialReactTable table={table} />;
 };
 
 export default BankAccounts;
