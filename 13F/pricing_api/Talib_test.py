@@ -23,3 +23,5 @@ df['RSI'] = rsi
 
 # Display the last few rows with the calculated indicators
 print(df[['Close', 'MACD', 'Signal', 'Histogram', 'RSI']].tail())
+
+#fi
